@@ -1,5 +1,3 @@
-import java.util.HashSet;
-
 // Определение узла списка
 class ListNode {
     int val;
@@ -11,63 +9,38 @@ class ListNode {
     }
 }
 
-public class LinkedListDuplicates {
+public class LinkedListReverse {
     
-    // Метод для проверки наличия дубликатов (с использованием HashSet)
-    public static boolean hasDuplicates(ListNode head) {
-        if (head == null || head.next == null) {
-            return false;
-        }
-        
-        HashSet<Integer> seen = new HashSet<>();
+    // Метод для разворота односвязного списка (итеративный подход)
+    public static ListNode reverseList(ListNode head) {
+        ListNode prev = null;
         ListNode current = head;
         
         while (current != null) {
-            if (seen.contains(current.val)) {
-                return true; // Найден дубликат
-            }
-            seen.add(current.val);
-            current = current.next;
+            ListNode nextTemp = current.next; // Сохраняем следующий узел
+            current.next = prev;              // Разворачиваем указатель
+            prev = current;                   // Перемещаем prev на текущий
+            current = nextTemp;               // Перемещаем current на следующий
         }
         
-        return false; // Дубликатов нет
+        return prev; // Новый головной узел
     }
     
-    // Метод для проверки наличия дубликатов (без дополнительной памяти - O(n²))
-    public static boolean hasDuplicatesNoExtraMemory(ListNode head) {
+    // Метод для разворота односвязного списка (рекурсивный подход)
+    public static ListNode reverseListRecursive(ListNode head) {
+        // Базовый случай: пустой список или один элемент
         if (head == null || head.next == null) {
-            return false;
+            return head;
         }
         
-        ListNode current = head;
+        // Рекурсивно разворачиваем остальную часть списка
+        ListNode newHead = reverseListRecursive(head.next);
         
-        while (current != null) {
-            ListNode runner = current.next;
-            while (runner != null) {
-                if (current.val == runner.val) {
-                    return true; // Найден дубликат
-                }
-                runner = runner.next;
-            }
-            current = current.next;
-        }
+        // Разворачиваем текущий указатель
+        head.next.next = head;
+        head.next = null;
         
-        return false; // Дубликатов нет
-    }
-    
-    // Вспомогательный метод для создания списка из массива
-    public static ListNode createList(int[] values) {
-        if (values.length == 0) return null;
-        
-        ListNode head = new ListNode(values[0]);
-        ListNode current = head;
-        
-        for (int i = 1; i < values.length; i++) {
-            current.next = new ListNode(values[i]);
-            current = current.next;
-        }
-        
-        return head;
+        return newHead;
     }
     
     // Вспомогательный метод для печати списка
@@ -82,51 +55,24 @@ public class LinkedListDuplicates {
     
     // Пример использования
     public static void main(String[] args) {
-        // Тест 1: Список без дубликатов
-        int[] values1 = {1, 2, 3, 4, 5};
-        ListNode list1 = createList(values1);
+        // Создаем список: 1 -> 2 -> 3 -> 4 -> 5
+        ListNode head = new ListNode(1);
+        head.next = new ListNode(2);
+        head.next.next = new ListNode(3);
+        head.next.next.next = new ListNode(4);
+        head.next.next.next.next = new ListNode(5);
         
-        System.out.println("Список 1:");
-        printList(list1);
-        System.out.println("Есть дубликаты (HashSet): " + hasDuplicates(list1));
-        System.out.println("Есть дубликаты (без доп. памяти): " + hasDuplicatesNoExtraMemory(list1));
-        System.out.println();
+        System.out.println("Исходный список:");
+        printList(head);
         
-        // Тест 2: Список с дубликатами
-        int[] values2 = {1, 2, 3, 2, 5};
-        ListNode list2 = createList(values2);
+        // Разворачиваем список итеративно
+        ListNode reversedHead = reverseList(head);
+        System.out.println("Развернутый список (итеративно):");
+        printList(reversedHead);
         
-        System.out.println("Список 2:");
-        printList(list2);
-        System.out.println("Есть дубликаты (HashSet): " + hasDuplicates(list2));
-        System.out.println("Есть дубликаты (без доп. памяти): " + hasDuplicatesNoExtraMemory(list2));
-        System.out.println();
-        
-        // Тест 3: Пустой список
-        ListNode list3 = null;
-        
-        System.out.println("Список 3: пустой");
-        System.out.println("Есть дубликаты (HashSet): " + hasDuplicates(list3));
-        System.out.println("Есть дубликаты (без доп. памяти): " + hasDuplicatesNoExtraMemory(list3));
-        System.out.println();
-        
-        // Тест 4: Список из одного элемента
-        int[] values4 = {1};
-        ListNode list4 = createList(values4);
-        
-        System.out.println("Список 4:");
-        printList(list4);
-        System.out.println("Есть дубликаты (HashSet): " + hasDuplicates(list4));
-        System.out.println("Есть дубликаты (без доп. памяти): " + hasDuplicatesNoExtraMemory(list4));
-        System.out.println();
-        
-        // Тест 5: Список с несколькими дубликатами
-        int[] values5 = {1, 1, 2, 3, 3, 4};
-        ListNode list5 = createList(values5);
-        
-        System.out.println("Список 5:");
-        printList(list5);
-        System.out.println("Есть дубликаты (HashSet): " + hasDuplicates(list5));
-        System.out.println("Есть дубликаты (без доп. памяти): " + hasDuplicatesNoExtraMemory(list5));
+        // Разворачиваем обратно рекурсивно
+        ListNode originalHead = reverseListRecursive(reversedHead);
+        System.out.println("Восстановленный список (рекурсивно):");
+        printList(originalHead);
     }
 }
